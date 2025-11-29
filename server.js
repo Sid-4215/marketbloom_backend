@@ -186,9 +186,9 @@ app.delete("/api/submissions/:id", requireAdminAuth, async (req, res) => {
 });
 
 // ================================
-// Serve Frontend
+// Serve Frontend (Express 5 FIXED)
 // ================================
-app.use("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   res.sendFile(join(__dirname, "../dist/index.html"));
 });
 
