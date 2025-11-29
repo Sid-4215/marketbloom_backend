@@ -2,23 +2,18 @@
   "name": "server",
   "version": "1.0.0",
   "type": "module",
-  "description": "MarketBloom Studio Backend Server",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": ["marketbloom", "studio", "api", "backend"],
-  "author": "MarketBloom Studio",
-  "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "nodemailer": "^7.0.11",
-    "sqlite3": "^5.1.7"
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
