@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketBloom Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9; 
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+        .header h1 {
+            color: #facc15;
+            margin-bottom: 10px;
+        }
+        .login-form, .admin-panel { 
+            background: #1e293b; 
+            padding: 30px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        input { 
+            width: 100%;
+            padding: 12px; 
+            border: 1px solid #475569; 
+            border-radius: 5px; 
+            background: #334155; 
+            color: #f1f5f9; 
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.2);
+        }
+        button { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            background: #facc15; 
+            color: #1e293b; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            background: #eab308; 
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .submission { 
+            background: #334155; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px;
+            border-left: 4px solid #facc15;
+        }
+        .submission-header {
+            display: flex;
+            justify-content: between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        .submission-title {
+            flex: 1;
+        }
+        .submission h3 {
+            color: #facc15;
+            margin-bottom: 5px;
+        }
+        .submission-meta {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .submission-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        .hidden { display: none; }
+        .error { 
+            color: #ef4444; 
+            margin: 10px 0; 
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 5px;
+            border: 1px solid #ef4444;
+        }
+        .success { 
+            color: #22c55e; 
+            margin: 10px 0; 
+            padding: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 5px;
+            border: 1px solid #22c55e;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #334155;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #facc15;
+        }
+        .stat-label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MarketBloom Admin Panel</h1>
+            <p>Manage form submissions and monitor leads</p>
+        </div>
+        
+        <div id="loginForm" class="login-form">
+            <h2>🔐 Admin Login</h2>
+            <div class="form-group">
+                <label for="password">Admin Password</label>
+                <input type="password" id="password" placeholder="Enter admin password" autocomplete="current-password">
+            </div>
+            <button onclick="login()">Login to Dashboard</button>
+            <div id="loginMessage"></div>
+        </div>
+        
+        <div id="adminPanel" class="admin-panel hidden">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                <h2>📋 Form Submissions</h2>
+                <div>
+                    <button onclick="loadSubmissions()">🔄 Refresh</button>
+                    <button onclick="logout()" style="background: #475569; margin-left: 10px;">🚪 Logout</button>
+                </div>
+            </div>
+            
+            <div id="stats" class="stats"></div>
+            
+            <div id="submissionsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'marketbloom_secure_key_2025';
+        let adminToken = '';
+
+        async function login() {
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('loginMessage');
+            
+            if (!password) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Please enter a password';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({ password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    adminToken = data.token;
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    messageDiv.className = 'success';
+                    messageDiv.textContent = '✅ Login successful! Loading submissions...';
+                    loadSubmissions();
+                } else {
+                    messageDiv.className = 'error';
+                    messageDiv.textContent = '❌ ' + data.message;
+                }
+            } catch (error) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = '❌ Login failed: ' + error.message;
+            }
+        }
+
+        function logout() {
+            adminToken = '';
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('password').value = '';
+            document.getElementById('loginMessage').textContent = '';
+        }
+
+        async function loadSubmissions() {
+            const submissionsList = document.getElementById('submissionsList');
+            const statsDiv = document.getElementById('stats');
+            
+            try {
+                const response = await fetch('/api/submissions', {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'X-API-Key': API_KEY
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update stats
+                    const totalSubmissions = data.data.length;
+                    const newSubmissions = data.data.filter(s => s.status === 'new').length;
+                    const today = new Date().toDateString();
+                    const todaySubmissions = data.data.filter(s => 
+                        new Date(s.timestamp).toDateString() === today
+                    ).length;
+                    
+                    statsDiv.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${totalSubmissions}</div>
+                            <div class="stat-label">Total Submissions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${newSubmissions}</div>
+                            <div class="stat-label">New Leads</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${todaySubmissions}</div>
+                            <div class="stat-label">Today</div>
+                        </div>
+                    `;
+                    
+                    if (data.data.length === 0) {
+                        submissionsList.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 40px;">No submissions yet.</p>';
+                        return;
+                    }
+                    
+                    submissionsList.innerHTML = data.data.map(submission => `
+                        <div class="submission">
+                            <div class="submission-header">
+                                <div class="submission-title">
+                                    <h3>${submission.business}</h3>
+                                    <div class="submission-meta">
+                                        Submitted: ${new Date(submission.timestamp).toLocaleString()} 
+                                        | ID: ${submission.id}
+                                        | Status: <span style="color: ${submission.status === 'new' ? '#facc15' : '#22c55e'}">${submission.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="submission-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">👤 Name:</span> ${submission.name}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">🎯 Service:</span> ${submission.service}
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">📱 Phone:</span> 
+                                    <a href="https://wa.me/91${submission.phone}" target="_blank" style="color: #22c55e; text-decoration: none;">
+                                        ${submission.phone} ↗
+                                    </a>
+                                </div>
+                            </div>
+                            ${submission.message ? `
+                                <div class="detail-item">
+                                    <span class="detail-label">💬 Message:</span> 
+                                    <div style="margin-top: 5px; padding: 10px; background: #475569; border-radius: 5px;">
+                                        ${submission.message}
+                                    </div>
+                                </div>
+                            ` : ''}
+                            <div class="actions">
+                                <button onclick="contactLead('${submission.phone}')">
+                                    📞 Contact
+                                </button>
+                                <button class="btn-danger" onclick="deleteSubmission(${submission.id})">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    submissionsList.innerHTML = `<p class="error">Error loading submissions: ${data.message}</p>`;
+                }
+            } catch (error) {
+                submissionsList.innerHTML = `<p class="error">Failed to load submissions: ${error.message}</p>`;
+            }
+        }
+
+        function contactLead(phone) {
+            window.open(`https://wa.me/91${phone}`, '_blank');
+        }
+
+        async function deleteSubmission(id) {
+            if (!confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/submissions/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'X-API-Key': API_KEY
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Submission deleted successfully!');
+                    loadSubmissions();
+                } else {
+                    alert('Error deleting submission: ' + data.message);
+                }
+            } catch (error) {
+                alert('Failed to delete submission: ' + error.message);
+            }
+        }
+
+        // Auto-focus password field
+        document.getElementById('password').focus();
+        
+        // Allow login on Enter key
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Auto-logout after 2 hours
+        setTimeout(() => {
+            if (adminToken) {
+                logout();
+                alert('Session expired. Please login again.');
+            }
+        }, 2 * 60 * 60 * 1000);
+    </script>
+</body>
+</html>
