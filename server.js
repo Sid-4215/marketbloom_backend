@@ -53,7 +53,9 @@ initDB();
 // ================================
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(join(__dirname, "../dist")));
+
+// Serve only admin.html (no dist)
+app.use("/admin", express.static(__dirname));
 
 // ================================
 // Nodemailer (Gmail)
@@ -186,10 +188,10 @@ app.delete("/api/submissions/:id", requireAdminAuth, async (req, res) => {
 });
 
 // ================================
-// Serve Frontend (Express 5 FIXED)
+// Root Route
 // ================================
-app.get(/.*/, (req, res) => {
-  res.sendFile(join(__dirname, "../dist/index.html"));
+app.get("/", (req, res) => {
+  res.json({ message: "MarketBloom Backend Running" });
 });
 
 // ================================
